@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevTools Nexus</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        slate: {
+                            850: '#1e293b', 
+                            900: '#0f172a',
+                            950: '#020617',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                        'slide-up': 'slideUp 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0f172a;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
+        
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        .icon-glow {
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.2));
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569; 
+        }
+    </style>
+</head>
+<body class="text-slate-200 min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="sticky top-0 z-50 glass-card border-b border-white/5 px-6 py-4 mb-8">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                    <i class="fa-solid fa-layer-group text-white text-lg"></i>
+                </div>
+                <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-violet-400">
+                    ToolNexus
+                </h1>
+            </div>
+            
+            <div class="relative w-full md:w-96 group">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fa-solid fa-search text-slate-500 group-focus-within:text-blue-400 transition-colors"></i>
+                </div>
+                <input type="text" id="searchInput" 
+                    class="block w-full pl-10 pr-3 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg leading-5 text-slate-300 placeholder-slate-500 focus:outline-none focus:bg-slate-800 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all shadow-inner" 
+                    placeholder="Search tools...">
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl mx-auto px-6 pb-20 w-full">
+        
+        <!-- Hero Text -->
+        <div class="text-center mb-12 animate-fade-in">
+            <h2 class="text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-4">
+                Your Digital <span class="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">Utility Belt</span>
+            </h2>
+            <p class="text-lg text-slate-400 max-w-2xl mx-auto">
+                Access your essential collection of web tools, games, and converters in one centralized dashboard.
+            </p>
+        </div>
+
+        <!-- Grid Container -->
+        <div id="toolsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Cards will be injected here via JavaScript -->
+        </div>
+
+        <!-- Empty State (Hidden by default) -->
+        <div id="emptyState" class="hidden text-center py-20">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-800 mb-4">
+                <i class="fa-solid fa-ghost text-slate-500 text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-medium text-white">No tools found</h3>
+            <p class="text-slate-400 mt-2">Try searching for something else.</p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/5 bg-slate-950 py-8 mt-auto">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <p class="text-slate-500 text-sm">
+                &copy; <span id="year"></span> ToolNexus Collection. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Configuration for the tools
+        const toolsData = [
+            {
+                id: 1,
+                title: "jsDelivr GitHub",
+                category: "Developer",
+                description: "A free, fast, and reliable Open Source CDN for GitHub.",
+                url: "https://www.jsdelivr.com/github",
+                icon: "fa-brands fa-github",
+                color: "from-gray-700 to-gray-900",
+                btnText: "Access CDN"
+            },
+            {
+                id: 2,
+                title: "YT Link Beautifier",
+                category: "Utility",
+                description: "Clean up, customize and optimize your YouTube video links easily.",
+                url: "https://thupakulabp.github.io/YouTube-Link-Beautifier/",
+                icon: "fa-brands fa-youtube",
+                color: "from-red-600 to-red-800",
+                btnText: "Beautify Link"
+            },
+            {
+                id: 3,
+                title: "Sonic Stream",
+                category: "Media",
+                description: "Immersive audio streaming experience directly in your browser.",
+                url: "https://thupakulabp.github.io/Sonic-Stream/",
+                icon: "fa-solid fa-music",
+                color: "from-blue-500 to-indigo-600",
+                btnText: "Listen Now"
+            },
+            {
+                id: 4,
+                title: "Flip Master 3D",
+                category: "Game",
+                description: "Test your skills in this addictive 3D flipping simulation game.",
+                url: "https://thupakulabp.github.io/Flip-Master-3D/",
+                icon: "fa-solid fa-cube",
+                color: "from-emerald-500 to-teal-600",
+                btnText: "Play Game"
+            },
+            {
+                id: 5,
+                title: "CSV to Flashcard",
+                category: "Education",
+                description: "Convert spreadsheet data into interactive study flashcards.",
+                url: "https://csvtoflashcard.blogspot.com/",
+                icon: "fa-solid fa-file-csv",
+                color: "from-green-600 to-emerald-800",
+                btnText: "Convert Now"
+            },
+            {
+                id: 6,
+                title: "JSON to Mindmap",
+                category: "Productivity",
+                description: "Visualize complex JSON data structures as intuitive mind maps.",
+                url: "https://jsontomindmap.blogspot.com/",
+                icon: "fa-solid fa-diagram-project",
+                color: "from-orange-500 to-amber-600",
+                btnText: "Visualize"
+            },
+            {
+                id: 7,
+                title: "Lectio Reader",
+                category: "Utility",
+                description: "A distraction-free reading tool for focused content consumption.",
+                url: "https://thupakulabp.github.io/Lectio-Reader/",
+                icon: "fa-solid fa-book-open",
+                color: "from-violet-500 to-purple-600",
+                btnText: "Start Reading"
+            }
+        ];
+
+        const grid = document.getElementById('toolsGrid');
+        const searchInput = document.getElementById('searchInput');
+        const emptyState = document.getElementById('emptyState');
+        const yearSpan = document.getElementById('year');
+
+        // Set current year
+        yearSpan.textContent = new Date().getFullYear();
+
+        // Render Function
+        function renderTools(tools) {
+            grid.innerHTML = '';
+            
+            if (tools.length === 0) {
+                emptyState.classList.remove('hidden');
+                grid.classList.add('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            grid.classList.remove('hidden');
+
+            tools.forEach((tool, index) => {
+                const card = document.createElement('div');
+                card.className = `glass-card rounded-2xl p-6 flex flex-col h-full animate-slide-up relative overflow-hidden group`;
+                card.style.animationDelay = `${index * 100}ms`;
+
+                card.innerHTML = `
+                    <div class="absolute top-0 right-0 p-4 opacity-50">
+                        <span class="text-xs font-semibold px-2 py-1 rounded-full bg-slate-700/50 text-slate-300 border border-slate-600/50">
+                            ${tool.category}
+                        </span>
+                    </div>
+                    
+                    <div class="flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${tool.color} mb-6 shadow-lg shadow-black/20 group-hover:scale-110 transition-transform duration-300">
+                        <i class="${tool.icon} text-white text-2xl icon-glow"></i>
+                    </div>
+
+                    <h3 class="text-xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">${tool.title}</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-6 flex-grow">
+                        ${tool.description}
+                    </p>
+
+                    <a href="${tool.url}" target="_blank" rel="noopener noreferrer" 
+                       class="inline-flex items-center justify-center w-full px-4 py-3 text-sm font-semibold text-white transition-all duration-200 bg-slate-700/50 hover:bg-gradient-to-r hover:${tool.color} border border-slate-600 hover:border-transparent rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-blue-500 shadow-lg">
+                        <span>${tool.btnText}</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square ml-2 text-xs opacity-70"></i>
+                    </a>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Initial Render
+        renderTools(toolsData);
+
+        // Search Functionality
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const filtered = toolsData.filter(tool => 
+                tool.title.toLowerCase().includes(query) || 
+                tool.description.toLowerCase().includes(query) ||
+                tool.category.toLowerCase().includes(query)
+            );
+            renderTools(filtered);
+        });
+    </script>
+</body>
+</html>
